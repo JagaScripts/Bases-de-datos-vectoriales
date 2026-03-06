@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+llama-index
+llama-index-vector-stores-qdrant
+llama-index-llms-gemini
+llama-index-embeddings-gemini
+qdrant-client
+tenacity
+pytest
+httpx
+pytest-asyncio
