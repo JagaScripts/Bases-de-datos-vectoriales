@@ -1,10 +1,1 @@
-__pycache__/
-*.py[cod]
-*$py.class
-.venv/
-.env
-data/qdrant/
-*.log
-test_output.txt
-.pytest_cache/
-.agent/
+System.Object[]
