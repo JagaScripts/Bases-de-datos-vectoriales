@@ -43,25 +43,6 @@ def test_ingest_new_document_success():
 
 def test_update_document_triggers_soft_delete():
     # AC: System locates fragments of the previous document and updates metadata to status: archived
-    import qdrant_client as qc
-    from qdrant_client.models import Filter, FieldCondition, MatchValue
-    q_client = qc.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT)
-
-    # Cleanup residual data from previous test runs
-    cleanup_filter = Filter(
-        must=[FieldCondition(key="doc_id", match=MatchValue(value="doc_test_update_123"))]
-    )
-    existing = q_client.scroll(
-        collection_name=settings.COLLECTION_NAME,
-        scroll_filter=cleanup_filter,
-        limit=10000
-    )
-    if existing and existing[0]:
-        q_client.delete(
-            collection_name=settings.COLLECTION_NAME,
-            points_selector=[p.id for p in existing[0]]
-        )
-
     # Insert first version
     payload_v1 = {
         "doc_id": "doc_test_update_123",
