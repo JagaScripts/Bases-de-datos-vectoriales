@@ -7,4 +7,4 @@ data/qdrant/
 *.log
 test_output.txt
 .pytest_cache/
-.agent/
+
