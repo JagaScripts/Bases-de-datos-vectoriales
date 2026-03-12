@@ -43,6 +43,19 @@ uvicorn src.main:app --reload
 
 El servidor estará disponible en `http://localhost:8000`. Puedes acceder a la documentación interactiva en `http://localhost:8000/docs`.
 
+## 📂 Ingesta de Documentos (PDF)
+
+El sistema ahora soporta el procesamiento avanzado de PDFs (división por capítulos y resúmenes automáticos con Gemini).
+
+1. **Carga Manual Individual:** Puedes usar el endpoint `/api/v1/ingest` desde la documentación Swagger (`/docs`) subiendo cualquier archivo PDF.
+
+2. **Carga Masiva (Bulk Ingest):** Para cargar todos los PDFs que tengas en la carpeta `data/` de una sola vez:
+   ```bash
+   # Asegúrate de que la API esté corriendo en otra terminal
+   python -m scripts.bulk_ingest
+   ```
+
+
 ## 🧪 Testing
 
 Para ejecutar la suite de pruebas:

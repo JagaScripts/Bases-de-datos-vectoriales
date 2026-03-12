@@ -25,43 +25,46 @@ def test_metadata_extraction():
     assert doc.metadata["status"] == "active"
     assert doc.metadata["category"] == "NLP"
 
+import os
+import io
+
 def test_ingest_new_document_success():
-    payload = {
-        "doc_id": "doc_test_123",
-        "title": "A Test Report",
-        "category": "Testing",
-        "text": "This is a test document that should be chunked, embedded, and inserted into Qdrant."
-    }
+    # Creamos un PDF mínimo en memoria para el test
+    from pypdf import PdfWriter
+    writer = PdfWriter()
+    writer.add_blank_page(width=72, height=72)
+    pdf_bytes = io.BytesIO()
+    writer.write(pdf_bytes)
+    pdf_bytes.seek(0)
+
+    files = {"file": ("test.pdf", pdf_bytes, "application/pdf")}
     
-    response = client.post("/api/v1/ingest", json=payload)
+    response = client.post("/api/v1/ingest", files=files)
     
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
-    assert data["doc_id"] == "doc_test_123"
-    assert data["chunks_processed"] > 0
+    assert "sections_extracted" in data
 
 def test_update_document_triggers_soft_delete():
     # AC: System locates fragments of the previous document and updates metadata to status: archived
-    # Insert first version
-    payload_v1 = {
-        "doc_id": "doc_test_update_123",
-        "title": "Report v1",
-        "category": "Testing",
-        "text": "This is the first version of the document."
-    }
-    response_v1 = client.post("/api/v1/ingest", json=payload_v1)
+    # Creamos un PDF mínimo
+    from pypdf import PdfWriter
+    writer = PdfWriter()
+    writer.add_blank_page(width=72, height=72)
+    pdf_bytes = io.BytesIO()
+    writer.write(pdf_bytes)
+    pdf_bytes.seek(0)
+    
+    files = {"file": ("update_test.pdf", pdf_bytes, "application/pdf")}
+    response_v1 = client.post("/api/v1/ingest", files=files)
     assert response_v1.status_code == 200
 
-    # Insert second version
-    payload_v2 = {
-        "doc_id": "doc_test_update_123", # Same doc_id
-        "title": "Report v2",
-        "category": "Testing",
-        "text": "This is the updated version of the document with more info."
-    }
-    response_v2 = client.post("/api/v1/ingest", json=payload_v2)
+    # Insert second version (mismo nombre de archivo para simular actualización)
+    pdf_bytes.seek(0)
+    response_v2 = client.post("/api/v1/ingest", files=files)
     assert response_v2.status_code == 200
+
 
     # Verify directly in Qdrant
     import qdrant_client
