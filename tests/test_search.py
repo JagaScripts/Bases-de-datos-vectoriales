@@ -8,7 +8,7 @@ from qdrant_client.models import PointStruct
 from unittest.mock import patch
 
 client = TestClient(app)
-qdrant_client_sync = qdrant_client.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT)
+qdrant_client_sync = qdrant_client.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT, timeout=60)
 
 def test_search_filters_active_documents_only():
     try:
