@@ -4,8 +4,8 @@ pydantic
 pydantic-settings
 llama-index
 llama-index-vector-stores-qdrant
-llama-index-llms-gemini
-llama-index-embeddings-gemini
+llama-index-llms-google-genai
+llama-index-embeddings-google-genai
 qdrant-client
 tenacity
 pytest

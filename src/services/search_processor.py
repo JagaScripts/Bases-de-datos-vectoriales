@@ -4,8 +4,8 @@ import qdrant_client
 from llama_index.core import VectorStoreIndex, PromptTemplate
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core.vector_stores.types import MetadataFilters, ExactMatchFilter
-from llama_index.llms.gemini import Gemini
-from llama_index.embeddings.gemini import GeminiEmbedding
+from llama_index.llms.google_genai import GoogleGenAI
+from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.core import Settings
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 from src.config import settings
@@ -53,12 +53,15 @@ def _get_index():
         Settings.llm = MockLLM(max_tokens=64)
         Settings.embed_model = MockEmbedding(embed_dim=3072)
     else:
-        Settings.llm = Gemini(model=settings.MODEL_NAME, api_key=settings.GEMINI_API_KEY)
-        Settings.embed_model = GeminiEmbedding(model_name=settings.EMBEDDING_MODEL, api_key=settings.GEMINI_API_KEY)
+        Settings.llm = GoogleGenAI(model=settings.MODEL_NAME, api_key=settings.GEMINI_API_KEY)
+        Settings.embed_model = GoogleGenAIEmbedding(model_name=settings.EMBEDDING_MODEL, api_key=settings.GEMINI_API_KEY)
 
-    client = qdrant_client.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT)
+    client = qdrant_client.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT, timeout=60)
+    aclient = qdrant_client.AsyncQdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT, timeout=60)
+    
     vector_store = QdrantVectorStore(
         client=client,
+        aclient=aclient,
         collection_name=settings.COLLECTION_NAME
     )
     _index = VectorStoreIndex.from_vector_store(vector_store=vector_store)

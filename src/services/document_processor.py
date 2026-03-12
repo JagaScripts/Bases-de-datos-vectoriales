@@ -5,14 +5,14 @@ from qdrant_client.http import models
 from qdrant_client.models import PointStruct, Filter, FieldCondition, MatchValue
 from llama_index.core import Document
 from llama_index.core.node_parser import SentenceSplitter
-from llama_index.embeddings.gemini import GeminiEmbedding
+from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from pydantic import BaseModel
 from typing import List
 from src.config import settings
 
-qdrant_client_sync = qdrant_client.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT)
+qdrant_client_sync = qdrant_client.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT, timeout=60)
 
-embed_model = GeminiEmbedding(model_name=settings.EMBEDDING_MODEL, api_key=settings.GEMINI_API_KEY)
+embed_model = GoogleGenAIEmbedding(model_name=settings.EMBEDDING_MODEL, api_key=settings.GEMINI_API_KEY)
 node_parser = SentenceSplitter(chunk_size=settings.CHUNK_SIZE, chunk_overlap=settings.CHUNK_OVERLAP)
 
 async def process_and_ingest_document(doc_id: str, title: str, category: str, text: str) -> int:

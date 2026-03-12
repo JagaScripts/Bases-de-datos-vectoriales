@@ -68,7 +68,7 @@ def test_update_document_triggers_soft_delete():
     from qdrant_client.models import Filter, FieldCondition, MatchValue
     
     # Check directly from the qdrant DB
-    q_client = qdrant_client.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT)
+    q_client = qdrant_client.QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT, timeout=60)
     
     # Query for archived chunks
     filter_archived = Filter(
