@@ -8,31 +8,47 @@ Este proyecto implementa una API de RAG (Retrieval-Augmented Generation) diseña
 - **Base de Datos Vectorial:** Qdrant (Docker)
 - **Modelos:** Google Gemini (Embeddings & LLM)
 
-## 🛠️ Requisitos
-- Python 3.10+
-- Docker y Docker Compose
-- Clave de API de Google Gemini (configurada en `.env`)
+## 🛠️ Requisitos y Comprobación Preliminar
+
+Antes de comenzar, asegúrate de tener instalados los siguientes componentes:
+
+1.  **Docker:** Necesario para la base de datos vectorial Qdrant.
+    ```bash
+    docker --version
+    docker compose version
+    ```
+2.  **Python 3.10+:**
+    ```bash
+    python --version
+    ```
+3.  **Clave de API de Google Gemini:** Necesaria para embeddings y LLM.
 
 ## 🔧 Configuración Inicial
 
-1. **Entorno Virtual:**
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # En Windows: .venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+1.  **Entorno Virtual:**
+    ```bash
+    python -m venv .venv
+    # En Windows (PowerShell):
+    .\.venv\Scripts\Activate.ps1
+    # En Linux/Mac:
+    source .venv/bin/activate
+    
+    pip install -r requirements.txt
+    ```
 
-2. **Infraestructura (Qdrant):**
-   ```bash
-   docker compose up -d
-   ```
+2.  **Infraestructura (Qdrant):**
+    Asegúrate de que Docker está corriendo y ejecuta:
+    ```bash
+    docker compose up -d
+    ```
 
-3. **Variables de Entorno:**
-   Crea un archivo `.env` en la raíz del proyecto:
-   ```env
-   GOOGLE_API_KEY=tu_clave_aqui
-   QDRANT_URL=http://localhost:6333
-   ```
+3.  **Variables de Entorno:**
+    Crea un archivo `.env` en la raíz del proyecto basándote en el siguiente formato:
+    ```env
+    GEMINI_API_KEY=tu_clave_aquí
+    QDRANT_HOST=localhost
+    QDRANT_PORT=6333
+    ```
 
 ## 🏃 Ejecución
 
