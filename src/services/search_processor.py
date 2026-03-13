@@ -10,11 +10,12 @@ from llama_index.core import Settings
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 from src.config import settings
 
+# Configuración del registro de eventos para trazabilidad de errores y reintentos
 logger = logging.getLogger(__name__)
 
 
 def _is_rate_limit_error(exception: BaseException) -> bool:
-    """Detect HTTP 429 / Resource Exhausted errors from upstream LLM providers."""
+    """Detecta errores de límite de cuota (HTTP 429) o agotamiento de recursos del proveedor de LLM."""
     error_msg = str(exception).lower()
     return (
         "429" in error_msg
@@ -25,19 +26,19 @@ def _is_rate_limit_error(exception: BaseException) -> bool:
 
 
 @retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=2, min=2, max=60),
+    stop=stop_after_attempt(3), # Máximo 3 intentos para evitar bloqueos prolongados
+    wait=wait_exponential(multiplier=2, min=2, max=60), # Reintento exponencial progresivo
     retry=retry_if_exception(_is_rate_limit_error),
     reraise=True,
     before_sleep=lambda retry_state: logger.warning(
-        "Rate limit detected. Retrying in %.1fs (attempt %d/%d)",
+        "Límite de tasa detectado. Reintentando en %.1fs (intento %d/%d)",
         retry_state.next_action.sleep,
         retry_state.attempt_number,
         3,
     ),
 )
 async def _query_with_retry(query_engine, query: str):
-    """Execute the LLM query with automatic retry on rate-limit errors."""
+    """Ejecuta la consulta al LLM con lógica de reintento automático ante errores de cuota."""
     return await query_engine.aquery(query)
 
 _index = None
@@ -64,6 +65,7 @@ def _get_index():
         aclient=aclient,
         collection_name=settings.COLLECTION_NAME
     )
+    # Orquestador del índice vectorial usando el almacenamiento en Qdrant
     _index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
     return _index
 
@@ -71,6 +73,8 @@ def _get_index():
 async def perform_search(query: str):
     index = _get_index()
 
+    # Filtro estricto de metadatos para resolver el problema de la información actualizada
+    # Solo recuperamos fragmentos que tengan el estado 'active'
     filters = MetadataFilters(
         filters=[ExactMatchFilter(key="status", value="active")]
     )
@@ -88,6 +92,7 @@ async def perform_search(query: str):
     )
     qa_template = PromptTemplate(qa_template_str)
 
+    # Configuración del motor de búsqueda con el filtro de obsolescencia y plantilla personalizada
     query_engine = index.as_query_engine(
         filters=filters,
         similarity_top_k=5,

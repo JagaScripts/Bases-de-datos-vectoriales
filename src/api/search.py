@@ -17,6 +17,7 @@ class SearchResponse(BaseModel):
     response: str
     sources: List[SourceNode]
 
+# Procesa la pregunta del usuario y recupera información únicamente del contexto activo
 @router.post("/search", response_model=SearchResponse)
 async def search(request: SearchRequest):
     try:

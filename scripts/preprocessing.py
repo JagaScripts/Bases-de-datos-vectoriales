@@ -61,6 +61,7 @@ async def process_pdf(pdf_path: str, output_dir: str = "data/optimized_chunks") 
         logger.critical(f"No se pudo leer el PDF {pdf_path}: {e}")
         raise
 
+    # Estrategia de fragmentación: Bloques de 10 páginas para mantener coherencia semántica
     logger.info("Dividiendo PDF en bloques de 10 páginas (estrategia sin marcadores).")
     sections = []
     pages_per_chunk = 10
@@ -102,6 +103,7 @@ async def process_pdf(pdf_path: str, output_dir: str = "data/optimized_chunks") 
             
         summary = await generate_summary(section_text)
         
+        # Consolidación de metadatos y resúmenes para la posterior indexación vectorial
         summaries[filename] = {
             "title": section["title"],
             "summary": summary,

@@ -71,8 +71,11 @@ async def create_index_from_processed_chunks(data_path: str = "data/optimized_ch
             doc.metadata["section_title"] = summaries[file_name]["title"]
             # Truncamos el resumen para evitar errores de tamaño de metadatos en Qdrant
             summary_text = summaries[file_name]["summary"]
+            doc_id = file_name.split('.')[0] # Usamos el nombre del archivo como ID único base
+            doc.metadata["doc_id"] = doc_id
             doc.metadata["section_summary"] = (summary_text[:1000] + "...") if len(summary_text) > 1000 else summary_text
             logger.debug(f"Metadatos añadidos para: {file_name}")
+        # Marcamos como 'active' por defecto en la fase de indexación inicial
         doc.metadata["status"] = "active" 
 
     # Configuración de Qdrant
@@ -89,7 +92,7 @@ async def create_index_from_processed_chunks(data_path: str = "data/optimized_ch
             logger.info(f"Creando nueva colección: {settings.COLLECTION_NAME} con dim=3072")
             client.create_collection(
                 collection_name=settings.COLLECTION_NAME,
-                vectors_config=VectorParams(size=3072, distance=Distance.COSINE) # Ajustado para salida real observada
+                vectors_config=VectorParams(size=3072, distance=Distance.COSINE) # Configuración para Gemini Embedding
             )
 
         else:
